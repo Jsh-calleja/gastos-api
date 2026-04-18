@@ -36,10 +36,7 @@ def engine():
         app_db.engine = engine
     except Exception:
         pass
-
-    # Debug opcional (temporal): confirma que las tablas existen
-    # print("Tables in metadata:", list(SQLModel.metadata.tables.keys()))
-
+    
     return engine
 
 @pytest.fixture
