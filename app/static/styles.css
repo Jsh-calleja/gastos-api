@@ -1,0 +1,13 @@
+:root{--bg:#f7f8fb;--card:#fff;--accent:#2b6cb0;--muted:#666}
+body{font-family:Inter,system-ui,Segoe UI,Roboto,Helvetica,Arial,sans-serif;background:var(--bg);margin:0;color:#111}
+header{padding:24px 32px;background:linear-gradient(90deg,#fff,#f3f6fb);border-bottom:1px solid #e6e9ef}
+h1{margin:0;font-size:20px}
+.muted{color:var(--muted);margin-top:6px}
+main{max-width:980px;margin:28px auto;padding:0 16px}
+.card{background:var(--card);padding:16px;border-radius:8px;box-shadow:0 1px 2px rgba(16,24,40,.04);margin-bottom:16px}
+.card h2{margin:0 0 12px 0;font-size:16px}
+form{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+label{display:flex;flex-direction:column;font-size:13px;min-width:160px}
+input,select,button{padding:8px;border:1px solid #d6dbe8;border-radius:6px}
+button{background:var(--accent);color:#fff;border:none;cursor:pointer}
+.result{background:#0f1724;color:#e6eef8;padding:12px;border-radius:6px;overflow:auto;max-height:220px}

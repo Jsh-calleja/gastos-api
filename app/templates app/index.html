@@ -1,0 +1,82 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Gastos API — Demo UI</title>
+  <link rel="stylesheet" href="/static/styles.css" />
+</head>
+<body>
+  <header>
+    <h1>Gastos API — Demo UI</h1>
+    <p class="muted">Quick UI to exercise the API endpoints (categories, accounts, transactions, reports).</p>
+  </header>
+
+  <main>
+    <section class="card">
+      <h2>Create Category</h2>
+      <form id="category-form">
+        <label>Name <input name="name" required /></label>
+        <label>Type
+          <select name="type">
+            <option value="income">income</option>
+            <option value="expense">expense</option>
+          </select>
+        </label>
+        <button type="submit">Create</button>
+      </form>
+      <pre id="category-result" class="result"></pre>
+    </section>
+
+    <section class="card">
+      <h2>Create Account</h2>
+      <form id="account-form">
+        <label>Name <input name="name" required /></label>
+        <label>Balance <input name="balance" type="number" step="0.01" value="0.0" required /></label>
+        <button type="submit">Create</button>
+      </form>
+      <pre id="account-result" class="result"></pre>
+    </section>
+
+    <section class="card">
+      <h2>Create Transaction</h2>
+      <form id="transaction-form">
+        <label>Type
+          <select name="type">
+            <option value="income">income</option>
+            <option value="expense">expense</option>
+          </select>
+        </label>
+        <label>Date <input name="date" type="date" required /></label>
+        <label>Amount <input name="amount" type="number" step="0.01" required /></label>
+        <label>Category
+          <select id="category-select" name="category_id" required>
+            <option value="">— select category —</option>
+          </select>
+        </label>
+        <label>Account
+          <select id="account-select" name="account_id" required>
+            <option value="">— select account —</option>
+          </select>
+        </label>
+        <button type="submit">Create</button>
+      </form>
+      <pre id="transaction-result" class="result"></pre>
+    </section>
+
+    <section class="card">
+      <h2>Reports</h2>
+      <button id="run-report">Avg salary per month</button>
+      <pre id="report-result" class="result"></pre>
+    </section>
+
+    <section class="card">
+      <h2>Raw OpenAPI</h2>
+      <a href="/openapi.json" target="_blank">/openapi.json</a>
+      <a href="/docs" target="_blank">/docs (Swagger UI)</a>
+    </section>
+  </main>
+
+  <script src="/static/app.js"></script>
+</body>
+</html>
