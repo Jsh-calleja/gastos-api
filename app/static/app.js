@@ -107,3 +107,124 @@ document.getElementById('run-report').addEventListener('click', async () => {
 initLists().catch(err => {
   console.error('Failed to initialize lists', err);
 });
+/* ---------- Toolbar behavior ---------- */
+
+function setBulkDeleteEnabled(enabled) {
+  document.getElementById('btn-bulk-delete').disabled = !enabled;
+}
+
+function getSelectedTransactionIds() {
+  return Array.from(document.querySelectorAll('#transactions-table tbody input[type="checkbox"]:checked'))
+    .map(cb => Number(cb.dataset.id));
+}
+
+/* Render transactions rows with selection checkbox */
+function renderTransactions(items) {
+  const tbody = document.querySelector('#transactions-table tbody');
+  tbody.innerHTML = '';
+  items.forEach(tx => {
+    const tr = document.createElement('tr');
+    tr.dataset.id = tx.id;
+    tr.innerHTML = `
+      <td><input type="checkbox" data-id="${tx.id}" class="tx-select" /></td>
+      <td>${tx.id}</td>
+      <td>${tx.date}</td>
+      <td>${tx.type}</td>
+      <td>${tx.amount}</td>
+      <td>${tx.category_id ?? ''}</td>
+      <td>${tx.account_id ?? ''}</td>
+      <td>
+        <button data-action="edit" data-id="${tx.id}">Edit</button>
+        <button data-action="delete" data-id="${tx.id}">Delete</button>
+      </td>
+    `;
+    tbody.appendChild(tr);
+  });
+  // wire selection change
+  document.querySelectorAll('.tx-select').forEach(cb => {
+    cb.addEventListener('change', () => {
+      const any = document.querySelectorAll('#transactions-table tbody input[type="checkbox"]:checked').length > 0;
+      setBulkDeleteEnabled(any);
+      // highlight row
+      const row = cb.closest('tr');
+      if (cb.checked) row.classList.add('selected'); else row.classList.remove('selected');
+    });
+  });
+  // reset select-all
+  document.getElementById('select-all').checked = false;
+  setBulkDeleteEnabled(false);
+}
+
+/* Select all checkbox */
+document.getElementById('select-all').addEventListener('change', (e) => {
+  const checked = e.target.checked;
+  document.querySelectorAll('#transactions-table tbody input[type="checkbox"]').forEach(cb => {
+    cb.checked = checked;
+    const row = cb.closest('tr');
+    if (checked) row.classList.add('selected'); else row.classList.remove('selected');
+  });
+  setBulkDeleteEnabled(checked);
+});
+
+/* Bulk delete */
+document.getElementById('btn-bulk-delete').addEventListener('click', async () => {
+  const ids = getSelectedTransactionIds();
+  if (!ids.length) return;
+  if (!confirm(`Delete ${ids.length} transactions?`)) return;
+  // delete sequentially (or implement batch endpoint)
+  for (const id of ids) {
+    await fetch(`/transactions/${id}`, { method: 'DELETE' });
+  }
+  await loadTransactions();
+});
+
+/* Refresh button */
+document.getElementById('btn-refresh').addEventListener('click', async () => {
+  await loadTransactions();
+});
+
+/* Toggle view (example toggles a CSS class on table card) */
+let compactView = false;
+document.getElementById('btn-toggle-view').addEventListener('click', () => {
+  compactView = !compactView;
+  document.getElementById('transactions-table').classList.toggle('compact', compactView);
+});
+
+/* Filter and sort */
+document.getElementById('filter-type').addEventListener('change', async (e) => {
+  await loadTransactions(); // load and apply filter in client
+});
+document.getElementById('sort-by').addEventListener('change', async (e) => {
+  await loadTransactions();
+});
+
+/* Apply client-side filter/sort after fetching */
+async function loadTransactions() {
+  const data = await getJson('/transactions/');
+  if (!Array.isArray(data)) return renderTransactions([]);
+  // client-side filter
+  const typeFilter = document.getElementById('filter-type').value;
+  let items = data;
+  if (typeFilter) items = items.filter(i => i.type === typeFilter);
+  // client-side sort
+  const sort = document.getElementById('sort-by').value;
+  if (sort === 'date_desc') items.sort((a,b) => b.date.localeCompare(a.date));
+  if (sort === 'date_asc') items.sort((a,b) => a.date.localeCompare(b.date));
+  if (sort === 'amount_desc') items.sort((a,b) => b.amount - a.amount);
+  if (sort === 'amount_asc') items.sort((a,b) => a.amount - b.amount);
+  renderTransactions(items);
+}
+
+/* Quick new-item shortcuts */
+document.getElementById('btn-new-category').addEventListener('click', () => {
+  document.getElementById('category-form').scrollIntoView({behavior:'smooth'});
+});
+document.getElementById('btn-new-account').addEventListener('click', () => {
+  document.getElementById('account-form').scrollIntoView({behavior:'smooth'});
+});
+document.getElementById('btn-new-transaction').addEventListener('click', () => {
+  document.getElementById('transaction-form').scrollIntoView({behavior:'smooth'});
+});
+
+/* Wire initial load */
+initLists().then(() => loadTransactions()).catch(console.error);
